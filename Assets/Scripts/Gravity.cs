@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 public class Gravity : MonoBehaviour
 {
-    [SerializeField] float G = 1;
+    public float G = 1;
     private GravityObject[] gravityObjects;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
