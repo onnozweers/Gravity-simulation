@@ -11,4 +11,4 @@ Sliders:
 * Planet size - adjust the size for new planets
 * Gavity - adjust the gravity constant, applies to all objects
 
-* You can also drag the planets with your mouse cursor to move them around manually
+You can also drag the planets with your mouse cursor to move them around manually
