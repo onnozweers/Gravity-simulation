@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   G: 100
+  predictionIterations: 5000
 --- !u!4 &91498071
 Transform:
   m_ObjectHideFlags: 0

@@ -17,13 +17,11 @@ public class CircleSpawner : MonoBehaviour
         screenMousePosition.z = -mainCam.gameObject.transform.position.z;
         Vector3 worldMousePosition = mainCam.ScreenToWorldPoint(screenMousePosition);
 
-        Debug.Log(worldMousePosition);
-
         if (Input.GetKeyDown(KeyCode.E))
         {
             Instantiate(circlePrefab, worldMousePosition, Quaternion.identity);
             gravityScript.CheckForGravityObjects();
         }
-        
+
     }
 }
