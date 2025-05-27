@@ -1,50 +1,61 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.Mathematics;
+
 public class Gravity : MonoBehaviour
 {
     public float G = 1;
     public int predictionIterations = 100;
+    private float lastG;
+    private int lastObjectCount;
+
     private GravityObject[] gravityObjects;
     private List<Vector2>[] predictedPositions;
     private List<Vector2>[] predictedVelocities;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    bool hasReleasedMouse;
+
     void Start()
     {
         CheckForGravityObjects();
-        int n = gravityObjects.Length;
-        predictedPositions = new List<Vector2>[n];
-        predictedVelocities = new List<Vector2>[n];
-        for (int i = 0; i < n; i++)
-        {
-            predictedPositions[i] = new List<Vector2>(predictionIterations);
-            predictedVelocities[i] = new List<Vector2>(predictionIterations);
-        }
+        lastG = G;
+        lastObjectCount = gravityObjects.Length;
+        InitializePredictionArrays();
         InitializePredictions();
-        UpdateAllLineRenderers(); // Draw initial predictions
+        UpdateAllLineRenderers();
     }
 
-    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetMouseButtonUp(0))
+        {
+            hasReleasedMouse = true;
+        }
+    }
     void FixedUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        CheckForGravityObjects();
+
+        if (G != lastG || gravityObjects.Length != lastObjectCount || hasReleasedMouse == true)
         {
-            Debug.Log("Trying to update predictions");
+            hasReleasedMouse = false;
+            Debug.Log("Detected change in G or object count. Updating predictions.");
+            lastG = G;
+            lastObjectCount = gravityObjects.Length;
+            InitializePredictionArrays();
             InitializePredictions();
             UpdateAllLineRenderers();
         }
+
         foreach (GravityObject ownObj in gravityObjects)
         {
             foreach (GravityObject objToAttract in gravityObjects)
             {
                 if (ownObj != objToAttract)
                 {
-                    Vector2 direction = ownObj.gameObject.transform.position - objToAttract.gameObject.transform.position;
-
+                    Vector2 direction = ownObj.transform.position - objToAttract.transform.position;
                     Rigidbody2D objToAttract_rb = objToAttract.GetComponent<Rigidbody2D>();
                     Rigidbody2D ownObj_rb = ownObj.GetComponent<Rigidbody2D>();
-
-
 
                     if (direction.magnitude > 0.01f)
                     {
@@ -60,10 +71,9 @@ public class Gravity : MonoBehaviour
         gravityObjects = FindObjectsByType<GravityObject>(FindObjectsSortMode.None);
     }
 
-    public void InitializePredictions()
+    private void InitializePredictionArrays()
     {
         int n = gravityObjects.Length;
-
         predictedPositions = new List<Vector2>[n];
         predictedVelocities = new List<Vector2>[n];
         for (int i = 0; i < n; i++)
@@ -71,7 +81,11 @@ public class Gravity : MonoBehaviour
             predictedPositions[i] = new List<Vector2>(predictionIterations);
             predictedVelocities[i] = new List<Vector2>(predictionIterations);
         }
+    }
 
+    public void InitializePredictions()
+    {
+        int n = gravityObjects.Length;
         Vector2[] positions = new Vector2[n];
         Vector2[] velocities = new Vector2[n];
         float[] masses = new float[n];
@@ -85,13 +99,12 @@ public class Gravity : MonoBehaviour
 
         for (int step = 0; step < predictionIterations; step++)
         {
-            // Save predictions
             for (int i = 0; i < n; i++)
             {
                 predictedPositions[i].Add(positions[i]);
                 predictedVelocities[i].Add(velocities[i]);
             }
-            // Gravity step (simple Euler)
+
             Vector2[] forces = new Vector2[n];
             for (int i = 0; i < n; i++)
             {
@@ -122,14 +135,13 @@ public class Gravity : MonoBehaviour
             {
                 lr = gravityObjects[i].gameObject.AddComponent<LineRenderer>();
                 lr.widthMultiplier = 0.05f;
-                lr.material = new Material(Shader.Find("Sprites/Default")); // Simple visible material
+                lr.material = new Material(Shader.Find("Sprites/Default"));
                 lr.startColor = lr.endColor = Color.yellow;
             }
 
             lr.positionCount = predictedPositions[i].Count;
             for (int j = 0; j < predictedPositions[i].Count; j++)
             {
-                // Convert 2D position to 3D for LineRenderer
                 Vector2 pos2D = predictedPositions[i][j];
                 lr.SetPosition(j, new Vector3(pos2D.x, pos2D.y, 0));
             }
