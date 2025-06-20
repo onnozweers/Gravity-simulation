@@ -23,7 +23,7 @@ public class Gravity : MonoBehaviour
         lastObjectCount = gravityObjects.Length;
         InitializePredictionArrays();
         InitializePredictions();
-        UpdateAllLineRenderers();
+        // UpdateAllLineRenderers();
     }
 
     void Update()
@@ -45,10 +45,11 @@ public class Gravity : MonoBehaviour
             hasReleasedMouse = false;
             lastG = G;
             lastObjectCount = gravityObjects.Length;
-            InitializePredictionArrays();
-            InitializePredictions();
+
             if (showingLineRenderers)
             {
+                InitializePredictionArrays();
+                InitializePredictions();
                 UpdateAllLineRenderers();
             }
         }
@@ -132,7 +133,6 @@ public class Gravity : MonoBehaviour
 
     public void UpdateAllLineRenderers()
     {
-        Debug.Log("Updating line renderers");
         int n = gravityObjects.Length;
         for (int i = 0; i < n; i++)
         {
@@ -158,15 +158,19 @@ public class Gravity : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.L))
         {
+            showingLineRenderers = !showingLineRenderers; // Toggle the value
+            if (showingLineRenderers)
+            {
+                UpdateAllLineRenderers();
+            }
             // Loop through each GravityObject in the list
             foreach (GravityObject gravityObject in gravityObjects)
             {
                 LineRenderer lr = gravityObject.gameObject.GetComponent<LineRenderer>();
                 if (lr != null)
                 {
-                    lr.enabled = !lr.enabled; // Toggle the value
+                    lr.enabled = showingLineRenderers;
                 }
-                showingLineRenderers = !showingLineRenderers;
             }
         }
     }

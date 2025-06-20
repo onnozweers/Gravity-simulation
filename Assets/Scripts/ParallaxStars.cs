@@ -20,7 +20,8 @@ public class ParallaxStars : MonoBehaviour
         // Instantiate stars for in the background
         for (int i = 0; i < amountOfStars; i++)
         {
-            GameObject spawnedStar = Instantiate(starPrefab,
+            GameObject spawnedStar = Instantiate(
+            starPrefab,
             randomPosition(minDistance, maxDistance),
             Quaternion.identity,
             transform
@@ -36,12 +37,13 @@ public class ParallaxStars : MonoBehaviour
         {
             bool wrapped = false;
             Vector3 screenPosition = mainCam.WorldToScreenPoint(star.transform.position);
-            if (screenPosition.x < 0) {screenPosition.x = width; wrapped = true;}
-            else if (screenPosition.x > width) {screenPosition.x = 0; wrapped = true;}
-            if (screenPosition.y < 0) {screenPosition.y = height; wrapped = true;}
-            else if (screenPosition.y > height) {screenPosition.y = 0; wrapped = true;}
+            if (screenPosition.x < 0) { screenPosition.x = width; wrapped = true; }
+            else if (screenPosition.x > width) { screenPosition.x = 0; wrapped = true; }
+            if (screenPosition.y < 0) { screenPosition.y = height; wrapped = true; }
+            else if (screenPosition.y > height) { screenPosition.y = 0; wrapped = true; }
 
-            if (wrapped){
+            if (wrapped)
+            {
                 star.transform.position = mainCam.ScreenToWorldPoint(new(screenPosition.x, screenPosition.y, screenPosition.z));
             }
         }
