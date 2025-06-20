@@ -4,7 +4,8 @@ using Unity.Mathematics;
 
 public class Gravity : MonoBehaviour
 {
-    public float G = 1;
+    bool showingLineRenderers = true;
+    public float G = 0;
     public int predictionIterations = 100;
     private float lastG;
     private int lastObjectCount;
@@ -27,10 +28,13 @@ public class Gravity : MonoBehaviour
 
     void Update()
     {
+        ToggleLineRenderers();
         if (Input.GetMouseButtonUp(0))
         {
             hasReleasedMouse = true;
         }
+
+
     }
     void FixedUpdate()
     {
@@ -39,12 +43,14 @@ public class Gravity : MonoBehaviour
         if (G != lastG || gravityObjects.Length != lastObjectCount || hasReleasedMouse == true)
         {
             hasReleasedMouse = false;
-            Debug.Log("Detected change in G or object count. Updating predictions.");
             lastG = G;
             lastObjectCount = gravityObjects.Length;
             InitializePredictionArrays();
             InitializePredictions();
-            UpdateAllLineRenderers();
+            if (showingLineRenderers)
+            {
+                UpdateAllLineRenderers();
+            }
         }
 
         foreach (GravityObject ownObj in gravityObjects)
@@ -144,6 +150,23 @@ public class Gravity : MonoBehaviour
             {
                 Vector2 pos2D = predictedPositions[i][j];
                 lr.SetPosition(j, new Vector3(pos2D.x, pos2D.y, 0));
+            }
+        }
+    }
+
+    public void ToggleLineRenderers()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            // Loop through each GravityObject in the list
+            foreach (GravityObject gravityObject in gravityObjects)
+            {
+                LineRenderer lr = gravityObject.gameObject.GetComponent<LineRenderer>();
+                if (lr != null)
+                {
+                    lr.enabled = !lr.enabled; // Toggle the value
+                }
+                showingLineRenderers = !showingLineRenderers;
             }
         }
     }
