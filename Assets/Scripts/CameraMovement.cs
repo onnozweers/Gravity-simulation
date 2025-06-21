@@ -15,19 +15,19 @@ public class CameraMovement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            newPos.y += speed * Time.deltaTime;
+            newPos.y += speed * Time.unscaledDeltaTime;
         }
         else if (Input.GetKey(KeyCode.DownArrow))
         {
-            newPos.y -= speed * Time.deltaTime;
+            newPos.y -= speed * Time.unscaledDeltaTime;
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            newPos.x += speed * Time.deltaTime;
+            newPos.x += speed * Time.unscaledDeltaTime;
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            newPos.x -= speed * Time.deltaTime;
+            newPos.x -= speed * Time.unscaledDeltaTime;
         }
         transform.position = newPos;
     }

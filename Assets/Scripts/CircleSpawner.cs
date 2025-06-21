@@ -4,6 +4,7 @@ public class CircleSpawner : MonoBehaviour
     Camera mainCam;
     [SerializeField] GameObject circlePrefab;
     [SerializeField] Gravity gravityScript;
+    [SerializeField] Controls controlScript;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -19,8 +20,11 @@ public class CircleSpawner : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Instantiate(circlePrefab, worldMousePosition, Quaternion.identity);
-            gravityScript.CheckForGravityObjects();
+            GameObject instantiatedCircle = Instantiate(circlePrefab, worldMousePosition, Quaternion.identity);
+            instantiatedCircle.GetComponent<Collider2D>().enabled = controlScript.collidersActive;
+            instantiatedCircle.GetComponent<LineRenderer>().enabled = gravityScript.showingLineRenderers;
+
+            gravityScript.gravityObjects.Add(instantiatedCircle.GetComponent<GravityObject>());
         }
 
     }

@@ -1,16 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using Unity.Mathematics;
 
 public class Gravity : MonoBehaviour
 {
-    bool showingLineRenderers = true;
-    public float G = 0;
+    public bool showingLineRenderers = true;
+    public float G = 100;
     public int predictionIterations = 100;
     private float lastG;
     private int lastObjectCount;
 
-    private GravityObject[] gravityObjects;
+    public List<GravityObject> gravityObjects = new List<GravityObject>();
     private List<Vector2>[] predictedPositions;
     private List<Vector2>[] predictedVelocities;
 
@@ -18,12 +19,12 @@ public class Gravity : MonoBehaviour
 
     void Start()
     {
-        CheckForGravityObjects();
         lastG = G;
-        lastObjectCount = gravityObjects.Length;
+        lastObjectCount = gravityObjects.Count;
         InitializePredictionArrays();
         InitializePredictions();
         UpdateAllLineRenderers();
+        StartCoroutine(PeriodicallyRepredictTrajectories());
     }
 
     void Update()
@@ -38,13 +39,11 @@ public class Gravity : MonoBehaviour
     }
     void FixedUpdate()
     {
-        CheckForGravityObjects();
-
-        if (G != lastG || gravityObjects.Length != lastObjectCount || hasReleasedMouse == true)
+        if (G != lastG || gravityObjects.Count != lastObjectCount || hasReleasedMouse == true)
         {
             hasReleasedMouse = false;
             lastG = G;
-            lastObjectCount = gravityObjects.Length;
+            lastObjectCount = gravityObjects.Count;
 
             if (showingLineRenderers)
             {
@@ -73,14 +72,9 @@ public class Gravity : MonoBehaviour
         }
     }
 
-    public void CheckForGravityObjects()
-    {
-        gravityObjects = FindObjectsByType<GravityObject>(FindObjectsSortMode.None);
-    }
-
     private void InitializePredictionArrays()
     {
-        int n = gravityObjects.Length;
+        int n = gravityObjects.Count;
         predictedPositions = new List<Vector2>[n];
         predictedVelocities = new List<Vector2>[n];
         for (int i = 0; i < n; i++)
@@ -92,7 +86,7 @@ public class Gravity : MonoBehaviour
 
     public void InitializePredictions()
     {
-        int n = gravityObjects.Length;
+        int n = gravityObjects.Count;
         Vector2[] positions = new Vector2[n];
         Vector2[] velocities = new Vector2[n];
         float[] masses = new float[n];
@@ -119,7 +113,7 @@ public class Gravity : MonoBehaviour
                 {
                     if (i == j) continue;
                     Vector2 dir = positions[j] - positions[i];
-                    float distSqr = dir.sqrMagnitude + 0.01f;
+                    float distSqr = dir.sqrMagnitude;
                     forces[i] += G * masses[i] * masses[j] * dir.normalized / distSqr;
                 }
             }
@@ -133,19 +127,17 @@ public class Gravity : MonoBehaviour
 
     public void UpdateAllLineRenderers()
     {
-        int n = gravityObjects.Length;
+        int n = gravityObjects.Count;
         for (int i = 0; i < n; i++)
         {
             LineRenderer lr = gravityObjects[i].GetComponent<LineRenderer>();
-            if (lr == null)
-            {
-                lr = gravityObjects[i].gameObject.AddComponent<LineRenderer>();
-                lr.widthMultiplier = 0.05f;
-                lr.material = new Material(Shader.Find("Sprites/Default"));
-                lr.startColor = lr.endColor = Color.yellow;
-            }
 
+            lr.widthMultiplier = 0.05f;
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+            lr.startColor = Color.yellow;
+            lr.endColor = Color.black;
             lr.positionCount = predictedPositions[i].Count;
+
             for (int j = 0; j < predictedPositions[i].Count; j++)
             {
                 Vector2 pos2D = predictedPositions[i][j];
@@ -173,6 +165,21 @@ public class Gravity : MonoBehaviour
                 {
                     lr.enabled = showingLineRenderers;
                 }
+            }
+        }
+    }
+
+    public IEnumerator PeriodicallyRepredictTrajectories()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(5f);
+            Debug.Log(showingLineRenderers);
+            if (showingLineRenderers)
+            {
+                InitializePredictionArrays();
+                InitializePredictions();
+                UpdateAllLineRenderers();
             }
         }
     }
