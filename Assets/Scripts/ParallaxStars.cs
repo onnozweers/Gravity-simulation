@@ -7,10 +7,11 @@ public class ParallaxStars : MonoBehaviour
 
     [SerializeField] float minDistance;
     [SerializeField] float maxDistance;
-    private Camera mainCam;
 
-    private float width = Screen.width;
-    private float height = Screen.height;
+    Camera mainCam;
+    public static float areaSize = 0.0679f;
+    private float xBounds = 16 * areaSize;
+    private float yBounds = 9 * areaSize;
 
     private List<GameObject> stars = new List<GameObject>();
 
@@ -35,32 +36,34 @@ public class ParallaxStars : MonoBehaviour
     {
         foreach (GameObject star in stars)
         {
+            Vector3 relativePos = star.transform.position - mainCam.transform.position;
+            float z = relativePos.z;
+
             bool wrapped = false;
-            Vector3 screenPosition = mainCam.WorldToScreenPoint(star.transform.position);
-            if (screenPosition.x < 0) { screenPosition.x = width; wrapped = true; }
-            else if (screenPosition.x > width) { screenPosition.x = 0; wrapped = true; }
-            if (screenPosition.y < 0) { screenPosition.y = height; wrapped = true; }
-            else if (screenPosition.y > height) { screenPosition.y = 0; wrapped = true; }
+            Vector3 newPosition = star.transform.position;
+
+            if (relativePos.x < -xBounds * z) { newPosition.x += 2 * xBounds * z; wrapped = true; }
+            else if (relativePos.x > xBounds * z) { newPosition.x -= 2 * xBounds * z; wrapped = true; }
+
+            if (relativePos.y < -yBounds * z) { newPosition.y += 2 * yBounds * z; wrapped = true; }
+            else if (relativePos.y > yBounds * z) { newPosition.y -= 2 * yBounds * z; wrapped = true; }
 
             if (wrapped)
             {
-                star.transform.position = mainCam.ScreenToWorldPoint(new(screenPosition.x, screenPosition.y, screenPosition.z));
+                star.transform.position = newPosition;
             }
         }
     }
 
-    Vector3 randomPosition(float minDistance, float maxDistance)
+    Vector3 randomPosition(float minZDistance, float maxZDistance)
     {
-        // Generate a random coordinate on the screen.
-        Vector2 screenCoordinate = new Vector2(
-            Random.Range(0, width),
-            Random.Range(0, height)
-        );
+        Vector3 worldPosition;
 
-        // Convert the screen coordinate to a world position, and return said world position.
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(
-            new Vector3(screenCoordinate.x, screenCoordinate.y, Random.Range(minDistance, maxDistance))
-            );
+        worldPosition.z = Random.Range(minZDistance, maxZDistance);
+
+        worldPosition.x = Random.Range(-xBounds, xBounds) * Mathf.Abs(worldPosition.z);
+        worldPosition.y = Random.Range(-yBounds, yBounds) * Mathf.Abs(worldPosition.z);
+
         return worldPosition;
     }
 }

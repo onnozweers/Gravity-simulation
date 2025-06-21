@@ -23,7 +23,7 @@ public class Gravity : MonoBehaviour
         lastObjectCount = gravityObjects.Length;
         InitializePredictionArrays();
         InitializePredictions();
-        // UpdateAllLineRenderers();
+        UpdateAllLineRenderers();
     }
 
     void Update()
@@ -161,6 +161,8 @@ public class Gravity : MonoBehaviour
             showingLineRenderers = !showingLineRenderers; // Toggle the value
             if (showingLineRenderers)
             {
+                InitializePredictionArrays();
+                InitializePredictions();
                 UpdateAllLineRenderers();
             }
             // Loop through each GravityObject in the list
