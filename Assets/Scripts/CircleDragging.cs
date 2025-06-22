@@ -1,10 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CircleDragging : MonoBehaviour
 {
     Camera mainCam;
-    private GameObject selectedCircle;
-    [SerializeField] float strength;
+    [SerializeField] Gravity gravityScript;
+    private List<GameObject> selectedObjects = new List<GameObject>();
+    [SerializeField] Transform cursorTransform;
+    public float strength;
+    public float cursorRadius;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -14,26 +18,36 @@ public class CircleDragging : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 screenMousePosition = Input.mousePosition;
-        screenMousePosition.z = -mainCam.gameObject.transform.position.z;
+        Vector3 screenMousePosition = new(Input.mousePosition.x, Input.mousePosition.y, -mainCam.transform.position.z);
         Vector3 worldMousePosition = mainCam.ScreenToWorldPoint(screenMousePosition);
+
+        Debug.Log(worldMousePosition);
 
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit2D hit = Physics2D.Raycast(worldMousePosition, Vector2.zero);
-            if (hit.collider != null)
+
+            foreach (GravityObject obj in gravityScript.gravityObjects)
             {
-                selectedCircle = hit.collider.gameObject;
+                if (Vector2.Distance(worldMousePosition, obj.transform.position) < cursorRadius)
+                {
+                    selectedObjects.Add(obj.gameObject);
+                }
             }
         }
-        else if (Input.GetMouseButtonUp(0))
+        else if (Input.GetMouseButtonUp(0) && selectedObjects != null)
         {
-            selectedCircle = null;
+            selectedObjects.Clear();
         }
 
-        if (selectedCircle != null)
+        if (selectedObjects.Count != 0)
         {
-            selectedCircle.GetComponent<Rigidbody2D>().linearVelocity = (worldMousePosition - selectedCircle.transform.position)*strength;
+            foreach (GameObject obj in selectedObjects)
+            {
+                obj.GetComponent<Rigidbody2D>().linearVelocity = strength * (worldMousePosition - obj.transform.position);
+            }
         }
-    }   
+
+        cursorTransform.position = new(worldMousePosition.x, worldMousePosition.y, -0.01f);
+        cursorTransform.localScale = 2 * cursorRadius * Vector3.one;
+    }
 }
