@@ -8,6 +8,7 @@ public class CircleDragging : MonoBehaviour
     private List<GameObject> selectedObjects = new List<GameObject>();
     [SerializeField] Transform cursorTransform;
     public float strength;
+    public float damping;
     public float cursorRadius;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -30,12 +31,17 @@ public class CircleDragging : MonoBehaviour
             {
                 if (Vector2.Distance(worldMousePosition, obj.transform.position) < cursorRadius)
                 {
+                    obj.gameObject.GetComponent<Rigidbody2D>().linearDamping = damping;
                     selectedObjects.Add(obj.gameObject);
                 }
             }
         }
         else if (Input.GetMouseButtonUp(0) && selectedObjects != null)
         {
+            foreach (GameObject obj in selectedObjects)
+            {
+                obj.GetComponent<Rigidbody2D>().linearDamping = 0;
+            }
             selectedObjects.Clear();
         }
 
@@ -43,7 +49,7 @@ public class CircleDragging : MonoBehaviour
         {
             foreach (GameObject obj in selectedObjects)
             {
-                obj.GetComponent<Rigidbody2D>().linearVelocity = strength * (worldMousePosition - obj.transform.position);
+                obj.GetComponent<Rigidbody2D>().AddForce(strength * (worldMousePosition - obj.transform.position));
             }
         }
 

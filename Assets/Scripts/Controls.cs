@@ -15,6 +15,7 @@ public class Controls : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Physics2D.IgnoreLayerCollision(0, 0, false);
         mainCam = Camera.main;
     }
 
@@ -34,7 +35,7 @@ public class Controls : MonoBehaviour
         {
             mainCam.fieldOfView += zoomSpeed * Time.unscaledDeltaTime;
         }
-        mainCam.fieldOfView = Mathf.Clamp(mainCam.fieldOfView, 17.4f, 61.7f);
+        mainCam.fieldOfView = Mathf.Clamp(mainCam.fieldOfView, 17.4f, 100f);
 
         if (Input.GetKeyDown(KeyCode.H))
         {

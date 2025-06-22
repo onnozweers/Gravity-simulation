@@ -12,6 +12,9 @@ public class Sliders : MonoBehaviour
     [Header("Time Slider")]
     [SerializeField] Slider timeSlider;
     private float timeSpeed = 1f;
+    [Header("Dragging strength slider")]
+    [SerializeField] Slider draggingStrengthSlider;
+    [SerializeField] CircleDragging draggingScript;
     public void Start()
     {
         AdjustSize();
@@ -32,5 +35,10 @@ public class Sliders : MonoBehaviour
         Debug.Log(timeSlider.value);
         timeSpeed = timeSlider.value;
         Time.timeScale = timeSpeed;
+    }
+    public void AdjustDraggingStrength()
+    {
+        Debug.Log(draggingStrengthSlider.value);
+        draggingScript.strength = draggingStrengthSlider.value;
     }
 }

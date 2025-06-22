@@ -173,7 +173,7 @@ public class Gravity : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(0.1f);
             Debug.Log(showingLineRenderers);
             if (showingLineRenderers)
             {

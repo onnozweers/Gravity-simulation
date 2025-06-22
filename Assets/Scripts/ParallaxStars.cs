@@ -9,7 +9,7 @@ public class ParallaxStars : MonoBehaviour
     [SerializeField] float maxDistance;
 
     Camera mainCam;
-    public static float areaSize = 0.0679f;
+    public static float areaSize = 0.1279f;
     private float xBounds = 16 * areaSize;
     private float yBounds = 9 * areaSize;
 
