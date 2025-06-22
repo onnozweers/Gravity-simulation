@@ -21,7 +21,6 @@ public class CircleSpawner : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             GameObject instantiatedCircle = Instantiate(circlePrefab, worldMousePosition, Quaternion.identity);
-            instantiatedCircle.GetComponent<Collider2D>().enabled = controlScript.collidersActive;
             instantiatedCircle.GetComponent<LineRenderer>().enabled = gravityScript.showingLineRenderers;
 
             gravityScript.gravityObjects.Add(instantiatedCircle.GetComponent<GravityObject>());
