@@ -49,7 +49,15 @@ public class CircleDragging : MonoBehaviour
         {
             foreach (GameObject obj in selectedObjects)
             {
-                obj.GetComponent<Rigidbody2D>().AddForce(strength * (worldMousePosition - obj.transform.position));
+                // Destroy the object when right clicked
+                if (Input.GetKeyDown(KeyCode.D))
+                {
+                    selectedObjects.Remove(obj);
+                    gravityScript.gravityObjects.Remove(obj.GetComponent<GravityObject>());
+                    Destroy(obj);
+                }
+                Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
+                rb.AddForce(rb.mass * strength * (worldMousePosition - obj.transform.position));
             }
         }
 
