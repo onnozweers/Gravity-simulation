@@ -50,7 +50,7 @@ public class CircleDragging : MonoBehaviour
             foreach (GameObject obj in selectedObjects)
             {
                 // Destroy the object when right clicked
-                if (Input.GetKeyDown(KeyCode.D))
+                if (Input.GetKey(KeyCode.D))
                 {
                     selectedObjects.Remove(obj);
                     gravityScript.gravityObjects.Remove(obj.GetComponent<GravityObject>());
