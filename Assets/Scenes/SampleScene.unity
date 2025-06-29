@@ -326,6 +326,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7774eb5b0f303e74d94f028221a92079, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  repulsionConstant: 1
+  logarithmBase: 10
+  maximumRepulsion: 0.3
   showingLineRenderers: 1
   G: 100
   predictionIterations: 5000

@@ -5,6 +5,12 @@ using Unity.Mathematics;
 
 public class Gravity : MonoBehaviour
 {
+    [Header("Repulsion settings")]
+    public float repulsionConstant;
+    public float logarithmBase;
+    public float maximumRepulsion;
+
+    [Header("Rest")]
     public bool showingLineRenderers = true;
     public float G = 100;
     public int predictionIterations = 100;
@@ -63,14 +69,31 @@ public class Gravity : MonoBehaviour
                     Rigidbody2D objToAttract_rb = objToAttract.GetComponent<Rigidbody2D>();
                     Rigidbody2D ownObj_rb = ownObj.GetComponent<Rigidbody2D>();
 
-                    if (direction.magnitude > 0.01f)
-                    {
-                        objToAttract_rb.AddForce(direction.normalized * (G * ownObj_rb.mass * objToAttract_rb.mass / Mathf.Pow(direction.magnitude, 2)));
-                    }
+                    objToAttract_rb.AddForce(direction.normalized * Mathf.Min(
+                        AttractionForce(ownObj_rb, objToAttract_rb, direction),
+                        RepulsionForce(direction, repulsionConstant, logarithmBase, maximumRepulsion)
+                        ));
                 }
             }
         }
     }
+
+    float AttractionForce(Rigidbody2D ownObj_rb, Rigidbody2D objToAttract_rb, Vector2 direction)
+    {
+        float x = direction.magnitude;
+        float y = G * ownObj_rb.mass * objToAttract_rb.mass / Mathf.Pow(x, 2);
+
+        return y;
+    }
+
+    float RepulsionForce(Vector2 direction, float repulsionConstant, float logBase, float maxRepulsion)
+    {
+        float x = direction.magnitude;
+        float y = Mathf.Max(Mathf.Log(x + repulsionConstant, logBase), 0.2f * x - maxRepulsion);
+
+        return y;
+    }
+
 
     private void InitializePredictionArrays()
     {
